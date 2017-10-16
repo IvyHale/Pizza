@@ -1,0 +1,46 @@
+@mainColor: orange;
+
+@import "pizza/pizza-card";
+@import "pizza/right-menu";
+
+.box-shadow(@insert, @x: 0, @y: 0, @blur: 10px, @color: #666) when (@insert = false) {
+    -webkit-box-shadow: @x @y @blur @color;
+    box-shadow: @x @y @blur @color;
+}
+
+.main-container{
+    padding-top: 200px;
+}
+
+.upper-menu{
+    position: fixed;
+    top:0;
+    background: black;
+    opacity: 0.85;
+    width: inherit;
+    color: lightgrey;
+}
+
+.upper-menu-top{
+    border: 3px;
+    border-bottom: solid 2px lightgrey;
+    padding-bottom: 2px;
+    margin:10px;
+    margin-top: 5px;
+}
+
+.upper-menu-top p{
+    margin-top:5px;
+}
+
+.upper-menu-top-second{
+    padding-top: 2px;
+    font-size: 12px;
+}
+
+.upper-menu-bottom{
+    color:white;
+    margin:10px;
+    padding-left: 1em;
+}
+
