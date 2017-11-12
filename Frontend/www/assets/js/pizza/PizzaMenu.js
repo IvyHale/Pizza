@@ -6,7 +6,7 @@ var PizzaCart = require('./PizzaCart');
 var Pizza_List = require('../Pizza_List');
 
 //HTML едемент куди будуть додаватися піци
-var $pizza_list = $("#pizza_list");
+var $pizza_list = $("#pizza-list");
 
 function showPizzaList(list) {
     //Очищаємо старі піци в кошику

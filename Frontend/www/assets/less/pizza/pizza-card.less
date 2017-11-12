@@ -1,10 +1,65 @@
 .pizza-card {
+    position: relative;
+    padding-top: 30px;
+
   img {
-    max-width: 250px;
+    width: 100%;
+    max-width: 300px;
   }
 
   h3 {
-    color: @mainColor;
-    background-color: lighten(@mainColor, 45%);
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 18px;
   }
+
+  .thumbnail {
+    display: block;
+    padding: 4px;
+    margin-bottom: 20px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+
+    .caption{
+      padding:9px;
+    }
+
+    .title{
+      font-size: 30px;
+      color: @mainColor;
+      font-weight: 700;
+      font-family: "Helvetica Neue";
+    }
+
+    .type{
+      font-size: 12px;
+      color: #a3a0a0;
+    }
+
+    .description{
+      font-size: 14px;
+      height: 65px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row{
+      text-align: center;
+      margin-right: -15px;
+      margin-left: -15px;
+
+      img{
+        vertical-align: middle;
+        border: 0;
+        width:10px;
+      }
+    }
+
+  }
+
+
+
 }
