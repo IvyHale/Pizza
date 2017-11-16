@@ -2,64 +2,159 @@
  * Created by chaika on 02.02.16.
  */
 var Templates = require('../Templates');
+var localStorage = require('../localStorage.js');
 
+//cart_item variables are of "type" pizza + quantity and size fields!
 //Перелік розмірів піци
 var PizzaSize = {
     Big: "big_size",
     Small: "small_size"
 };
 
-//Змінна в якій зберігаються перелік піц в кошику
-var Cart = [];
+var Cart = [];  //Змінна в якій зберігаються перелік піц в кошику
+var sum=0;
+var $cart = $("#cart"); //HTML едемент куди будуть додаватися піци
 
-//HTML едемент куди будуть додаватися піци
-var $cart = $("#cart");
-
+//#region  adding and removing items
 function addToCart(pizza, size) {
-    //Додавання однієї піци в кошик покупок
+    
+    //if pizza already in the cart, increment quality
+    if(labelPresent(pizza, size)){
+        incrementQuantity(pizza, size);
+    } else {
+        Cart.push({
+            pizza: pizza,
+            size: size,
+            quantity: 1
+        });
+    } 
 
-    //Приклад реалізації, можна робити будь-яким іншим способом
-    Cart.push({
-        pizza: pizza,
-        size: size,
-        quantity: 1
-    });
-
+    //recalculate the order sum
+    incrementTotalCost(pizza[size].price);
+    
     //Оновити вміст кошика на сторінці
-    updateCart();
+    redrawCart();
 }
 
 function removeFromCart(cart_item) {
     //Видалити піцу з кошика
-    //TODO: треба зробити
+    Cart.splice(Cart.indexOf(cart_item), 1);
+
+    //recalculate order sum
+    incrementTotalCost(- cart_item.pizza[cart_item.size].price * cart_item.quantity );
 
     //Після видалення оновити відображення
-    updateCart();
+    redrawCart();
 }
+
+// adds the cost_change to quantity label value
+function incrementTotalCost(cost_change){
+    quantity_node = $('#order-sum-bottom');
+    var curr_sum = sum;
+    var new_sum =  curr_sum + cost_change;
+
+    if(new_sum < 0){
+        console.error('total order cost is < 0!')
+        quantity_node.text(0);
+        sum=0;
+        // $('.r3 span').style.display('none');
+        // $('.button-order').isDisabled(true);
+    } else {
+        // $('.r3 span').style.display('inline-block');
+        // $('.button-order').isDisabled(false);
+        quantity_node.text(new_sum);
+    }
+
+    sum=new_sum;
+    alert(sum);
+}
+
+function labelPresent(pizza, size) {
+    var res = false;
+    Cart.forEach( function(element) {
+        if(element.pizza.title == pizza.title && element.size == size){
+            res =  true;
+        }
+    });
+    return res; 
+}
+
+function incrementQuantity(pizza, size){
+    Cart.forEach(function(element) {
+        if(element.pizza.title && element.size == size){
+            element.quantity += 1;
+        }
+    });
+    redrawCart();
+}
+
+function sizeToString(size){
+    switch(size){
+        case PizzaSize.Big:
+            return "Велика";
+
+        case PizzaSize.Small:
+            return "Мала";
+
+        default:
+            console.error("Can't stringify size - passed argument is not of type PizzaSize");
+    }
+}
+//#endregion 
 
 function initialiseCart() {
     //Фукнція віпрацьвуватиме при завантаженні сторінки
     //Тут можна наприклад, зчитати вміст корзини який збережено в Local Storage то показати його
-    //TODO: ...
+    
+    var saved_cart = localStorage.get('cart');
+    var saved_sum = localStorage.get('sum');
 
-    updateCart();
+    if(saved_cart){
+        Cart = saved_cart;
+        sum=saved_sum;
+    }
+
+    window.onbeforeunload = function() {
+        localStorage.set('cart', Cart);
+        localStorage.set('sum', sum);
+    };
+
+    $('span.clear-order').click(function() {
+        Cart = [];
+        sum=0;
+        redrawCart();
+    });
+    redrawCart();
+
 }
 
-function getPizzaInCart() {
+function getCart() {
     //Повертає піци які зберігаються в кошику
     return Cart;
 }
 
-function updateCart() {
-    //Функція викликається при зміні вмісту кошика
-    //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміт кошика в Local Storage
+//#region cart update methods
 
+//redraws every element of cart to the card panel
+function redrawCart() {
+    //Функція викликається при зміні вмісту кошика
+    //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміст кошика в Local Storage
     //Очищаємо старі піци в кошику
     $cart.html("");
 
-    //Онволення однієї піци
-    function showOnePizzaInCart(cart_item) {
-        var html_code = Templates.PizzaCart_OneItem(cart_item);
+    $('#order-sum').text(Cart.length);
+    $('#order-sum-bottom').text(sum+" грн.");
+    //Оновлення однієї піци
+    function drawPizzaInCart(cart_item) {
+        var ejs_compatible_cart_item = {
+            pizza : cart_item.pizza,
+            size : cart_item.size,
+            size_string : sizeToString(cart_item.size),
+            quantity : cart_item.quantity
+        };
+
+        var html_code = Templates.PizzaCart_OneItem(ejs_compatible_cart_item);
+    
 
         var $node = $(html_code);
 
@@ -67,21 +162,45 @@ function updateCart() {
             //Збільшуємо кількість замовлених піц
             cart_item.quantity += 1;
 
+            //recalculate total cost
+            incrementTotalCost(cart_item.pizza[cart_item.size].price);
+            
             //Оновлюємо відображення
-            updateCart();
+            redrawCart();
         });
+        $node.find(".minus").click(function(){
+            var currQuantity = cart_item.quantity;
+            if(currQuantity > 1){
+                cart_item.quantity -= 1;
 
+                //recalculate total cost
+                incrementTotalCost(- cart_item.pizza[cart_item.size].price);
+    
+                //Оновлюємо відображення
+                redrawCart();
+            } else {
+                removeFromCart(cart_item);
+            }
+        });
+        $node.find(".cart-delete").click(function(){
+            removeFromCart(cart_item);
+            redrawCart();
+        });
+        
         $cart.append($node);
     }
-
-    Cart.forEach(showOnePizzaInCart);
-
+    
+    Cart.forEach(drawPizzaInCart);
 }
 
+//#endregion
+
+//#region Imports
 exports.removeFromCart = removeFromCart;
 exports.addToCart = addToCart;
 
-exports.getPizzaInCart = getPizzaInCart;
+exports.getPizzaInCart = getCart;
 exports.initialiseCart = initialiseCart;
 
 exports.PizzaSize = PizzaSize;
+//#endregion

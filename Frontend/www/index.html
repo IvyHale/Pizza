@@ -13,8 +13,6 @@
     <!-- LESS JavaScript компілятор -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.5.3/less.min.js"></script>
 
-
-
 </head>
 
 <body>
@@ -27,12 +25,11 @@
         <div class="discount-text">-20%</div>
     </div>
 
-
     <div class="navbar navbar-fixed-top top-panel">
         <div class="discount-top">
             <div class="discount-flag top-discount">
             </div>
-            <a class="pizza-logo" href="/index.html">
+            <a class="pizza-logo" href="index.html">
                 <div id="pizza-title2" class="title-1">
                     Pizza
                 </div>
@@ -59,56 +56,54 @@
         </div>
         <div class="header-bottom">
             <span class=" pizza-page" style="color:white;">
-            <a href="/index.html" class="hidden-xs">Піца</a> &nbsp;
+            <a href="index.html" class="hidden-xs">Піца</a> &nbsp;
         </span>
         </div>
     </div>
-
 
     <div class="main-container container-fluid">
         <div class="row">
             <div class="left-panel">
                 <div class="page-title">
                     <h2>
-                        <span class="count-tile">Усі піци</span>
+                        <span class="count-tile">Усі</span>
                         <span class="badge orange pizza-count">8</span>
                     </h2>
                 </div>
                 <div class="all-pizza-type-wrap">
                     <ul class="nav nav-pills all-pizza-type">
-                        <li role="presentation" class="active pizza-filter-button" id="filter-button-all-pizza">
+                        <li role="presentation" class="active pizza-filter-button" data-pizza-type="any">
                             <a href="#">
                                 Усі
                             </a>
                         </li>
-                        <li role="presentation" class="pizza-filter-button" id="filter-button-meat">
+                        <li role="presentation" class="pizza-filter-button" data-pizza-type="meat">
                             <a href="#">
                                 Мясні
                             </a>
                         </li>
-                        <li role="presentation" class="pizza-filter-button" id="filter-button-pineapples">
+                        <li role="presentation" class="pizza-filter-button" data-pizza-type='pineapple'>
                             <a href="#">
                                 З ананасами
                             </a>
                         </li>
-                        <li role="presentation" class="pizza-filter-button" id="filter-button-mushrooms">
+                        <li role="presentation" class="pizza-filter-button" data-pizza-type='mushroom'>
                             <a href="#">
                                 З грибами
                             </a>
                         </li>
-                        <li role="presentation" class="pizza-filter-button" id="filter-button-ocean">
+                        <li role="presentation" class="pizza-filter-button" data-pizza-type='ocean'>
                             <a href="#">
                                 З морепродуктами
                             </a>
                         </li>
-                        <li role="presentation" class="pizza-filter-button" id="filter-button-tomato">
+                        <li role="presentation" class="pizza-filter-button" data-pizza-type="vega">
                             <a href="#">
                                 Вега
                             </a>
                         </li>
                     </ul>
                 </div>
-
 
             <div  class="pizza-list row" id="pizza-list">
                 <div class="col-sm-6 col-md-4">
@@ -164,7 +159,7 @@
                 <div class="r1">
                 <span class="order-list-title">
                     Замовлення
-                    <span class="badge orange orders-count-span">0</span>
+                    <span class="badge orange orders-count-span" id="order-sum">0</span>
                 </span>
 
                     <span class="clear-order">
@@ -178,7 +173,7 @@
                 <span class="sum-title" style="display:none">
                     Сума замовлення
                 </span>
-                    <span class="sum-number" style="display:none">
+                    <span class="sum-number" id="order-sum-bottom" style="display:none">
                     145 грн.
                 </span>
                     <div class="order-button">
@@ -192,9 +187,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-
 
     <!-- jQuery JavaScript -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
@@ -206,5 +199,4 @@
     <script type="text/javascript"  src="assets/js/main.js"> </script>
 
 </body>
-
 </html>
