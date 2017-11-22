@@ -11,4 +11,6 @@ exports.orderPage = function(req, res) {
     res.render('orderPage', {
         pageTitle: 'Замовлення'
     });
+
+
 };

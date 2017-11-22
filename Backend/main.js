@@ -26,6 +26,8 @@ function configureEndpoints(app) {
     app.use(express.static(path.join(__dirname, '../Frontend/www')));
 }
 
+
+
 function startServer(port) {
     //Створюється застосунок
     var app = express();

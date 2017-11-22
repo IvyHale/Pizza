@@ -9,7 +9,7 @@ exports.getPizzaList = function(req, res) {
 
 exports.createOrder = function(req, res) {
     var order_info = req.body;
-    console.log("Creating Order", order_info);
+    alert("Creating Order", order_info);
 
     res.send({
         success: true

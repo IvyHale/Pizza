@@ -25,6 +25,7 @@ function addToCart(pizza, size) {
         Cart.push({
             pizza: pizza,
             size: size,
+            price: pizza[size].price,
             quantity: 1
         });
     } 
@@ -57,16 +58,27 @@ function incrementTotalCost(cost_change){
         console.error('total order cost is < 0!')
         quantity_node.text(0);
         sum=0;
-        // $('.r3 span').style.display('none');
-        // $('.button-order').isDisabled(true);
+
     } else {
-        // $('.r3 span').style.display('inline-block');
-        // $('.button-order').isDisabled(false);
+
         quantity_node.text(new_sum);
     }
 
     sum=new_sum;
-    alert(sum);
+    // alert(sum);
+    checkSum();
+
+}
+
+function checkSum(){
+    if(sum<=0){
+        $('.r3 span').css('display','none');
+        $('.button-order').prop('disabled', true);
+    }
+    else{
+        $('.r3 span').css('display','inline-block');
+        $('.button-order').prop('disabled', false);
+    }
 }
 
 function labelPresent(pizza, size) {
@@ -83,6 +95,7 @@ function incrementQuantity(pizza, size){
     Cart.forEach(function(element) {
         if(element.pizza.title && element.size == size){
             element.quantity += 1;
+            element.price += element.pizza[element.size].price;
         }
     });
     redrawCart();
@@ -144,13 +157,15 @@ function redrawCart() {
 
     $('#order-sum').text(Cart.length);
     $('#order-sum-bottom').text(sum+" грн.");
+    checkSum();
     //Оновлення однієї піци
     function drawPizzaInCart(cart_item) {
         var ejs_compatible_cart_item = {
             pizza : cart_item.pizza,
             size : cart_item.size,
             size_string : sizeToString(cart_item.size),
-            quantity : cart_item.quantity
+            quantity : cart_item.quantity,
+            price:cart_item.price
         };
 
         var html_code = Templates.PizzaCart_OneItem(ejs_compatible_cart_item);
@@ -158,35 +173,47 @@ function redrawCart() {
 
         var $node = $(html_code);
 
-        $node.find(".plus").click(function(){
-            //Збільшуємо кількість замовлених піц
-            cart_item.quantity += 1;
+        if($(".order-page")[0]){
+            $node.find(".minus").css("display","none");
+            $node.find(".plus").css("display","none");
+            $node.find(".cart-delete").css("display","none");
 
-            //recalculate total cost
-            incrementTotalCost(cart_item.pizza[cart_item.size].price);
-            
-            //Оновлюємо відображення
-            redrawCart();
-        });
-        $node.find(".minus").click(function(){
-            var currQuantity = cart_item.quantity;
-            if(currQuantity > 1){
-                cart_item.quantity -= 1;
+        }
+        else {
+            $node.find(".plus").click(function () {
+                //Збільшуємо кількість замовлених піц
+                cart_item.quantity += 1;
+                cart_item.price += cart_item.pizza[cart_item.size].price;
 
                 //recalculate total cost
-                incrementTotalCost(- cart_item.pizza[cart_item.size].price);
-    
+                incrementTotalCost(cart_item.pizza[cart_item.size].price);
+
                 //Оновлюємо відображення
                 redrawCart();
-            } else {
+            });
+            $node.find(".minus").click(function () {
+                var currQuantity = cart_item.quantity;
+
+                if(currQuantity > 1){
+                    cart_item.quantity -= 1;
+                    cart_item.price -= cart_item.pizza[cart_item.size].price;
+
+                    //recalculate total cost
+                    incrementTotalCost(- cart_item.pizza[cart_item.size].price);
+
+                    //Оновлюємо відображення
+                    redrawCart();
+                } else {
+                    removeFromCart(cart_item);
+                }
+            });
+            $node.find(".cart-delete").click(function () {
                 removeFromCart(cart_item);
-            }
-        });
-        $node.find(".cart-delete").click(function(){
-            removeFromCart(cart_item);
-            redrawCart();
-        });
-        
+                redrawCart();
+            });
+        }
+
+
         $cart.append($node);
     }
     
