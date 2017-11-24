@@ -4,7 +4,6 @@
 var Templates = require('../Templates');
 var localStorage = require('../localStorage.js');
 
-//cart_item variables are of "type" pizza + quantity and size fields!
 //Перелік розмірів піци
 var PizzaSize = {
     Big: "big_size",
@@ -15,10 +14,8 @@ var Cart = [];  //Змінна в якій зберігаються перелі
 var sum=0;
 var $cart = $("#cart"); //HTML едемент куди будуть додаватися піци
 
-//#region  adding and removing items
 function addToCart(pizza, size) {
-    
-    //if pizza already in the cart, increment quality
+
     if(labelPresent(pizza, size)){
         incrementQuantity(pizza, size);
     } else {
@@ -30,7 +27,6 @@ function addToCart(pizza, size) {
         });
     } 
 
-    //recalculate the order sum
     incrementTotalCost(pizza[size].price);
     
     //Оновити вміст кошика на сторінці
@@ -41,14 +37,12 @@ function removeFromCart(cart_item) {
     //Видалити піцу з кошика
     Cart.splice(Cart.indexOf(cart_item), 1);
 
-    //recalculate order sum
     incrementTotalCost(- cart_item.pizza[cart_item.size].price * cart_item.quantity );
 
     //Після видалення оновити відображення
     redrawCart();
 }
 
-// adds the cost_change to quantity label value
 function incrementTotalCost(cost_change){
     quantity_node = $('#order-sum-bottom');
     var curr_sum = sum;
@@ -113,7 +107,6 @@ function sizeToString(size){
             console.error("Can't stringify size - passed argument is not of type PizzaSize");
     }
 }
-//#endregion 
 
 function initialiseCart() {
     //Фукнція віпрацьвуватиме при завантаженні сторінки
@@ -146,9 +139,6 @@ function getCart() {
     return Cart;
 }
 
-//#region cart update methods
-
-//redraws every element of cart to the card panel
 function redrawCart() {
     //Функція викликається при зміні вмісту кошика
     //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміст кошика в Local Storage
@@ -185,7 +175,6 @@ function redrawCart() {
                 cart_item.quantity += 1;
                 cart_item.price += cart_item.pizza[cart_item.size].price;
 
-                //recalculate total cost
                 incrementTotalCost(cart_item.pizza[cart_item.size].price);
 
                 //Оновлюємо відображення
@@ -198,7 +187,6 @@ function redrawCart() {
                     cart_item.quantity -= 1;
                     cart_item.price -= cart_item.pizza[cart_item.size].price;
 
-                    //recalculate total cost
                     incrementTotalCost(- cart_item.pizza[cart_item.size].price);
 
                     //Оновлюємо відображення
@@ -220,9 +208,6 @@ function redrawCart() {
     Cart.forEach(drawPizzaInCart);
 }
 
-//#endregion
-
-//#region Imports
 exports.removeFromCart = removeFromCart;
 exports.addToCart = addToCart;
 
@@ -230,4 +215,3 @@ exports.getPizzaInCart = getCart;
 exports.initialiseCart = initialiseCart;
 
 exports.PizzaSize = PizzaSize;
-//#endregion
