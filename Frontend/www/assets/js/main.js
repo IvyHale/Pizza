@@ -42,14 +42,30 @@ exports.createOrder = function(order_info, callback) {
 
 },{}],2:[function(require,module,exports){
 var API = require('./API');
+var PizzaCart = require('./pizza/PizzaCart');
 var markerClicked;
 var curAddress;
 var curTime;
 var map;
 var point;
 var directionsDisplay;
+var orderDescription="";
+
+function getPizzaFromCart(cart_item) {
+    var item = {
+        pizza : cart_item.pizza.title,
+        size : cart_item.size,
+        quantity : cart_item.quantity,
+        price:cart_item.price
+    };
+    orderDescription+=(item.pizza+" "+item.size+" "+item.quantity+" шт. "+item.price+" грн.;");
+}
 
 function initialiseOrder() {
+    var cart=PizzaCart.getPizzaInCart();
+    cart.forEach(getPizzaFromCart);
+    // alert(orderDescription);
+
     initialiseMap();
 
     $('#inputName').bind('input', function () {
@@ -66,20 +82,37 @@ function initialiseOrder() {
 
     $('#next').click(function () {
         if ($('.has-success').length == 3) {
+
+
             var order_data = {
                 name: nameInput.val(),
-                number: phoneInput.val(),
-                address: addressInput.val()
+                phone: phoneInput.val(),
+                address: addressInput.val(),
+                sum: $("#order-sum-bottom").text().split(" ")[0],
+                pizzas: orderDescription
             }
 
-            // console.log(order_data);
             API.createOrder(order_data, function (err, data) {
                 if (err) {
                     alert('Error creating order');
                 } else {
                     // $('#liqpay').attr("style", "");
 
-                    alert('Order created');
+                    // alert('Order created');
+                    LiqPayCheckout.init({
+                        data: data.data,
+                        signature: data.signature,
+                        embedTo: "#liqpay",
+                        mode: "popup"	//	embed	||	popup
+                    }).on("liqpay.callback", function (data) {
+                        console.log(data.status);
+                        console.log(data);
+                    }).on("liqpay.ready", function (data) {
+                        console.log(data.status);
+                        console.log(data);
+                    }).on("liqpay.close", function (data) {
+                    //	close
+                    });
                     // console.log(data);
                 }
             });
@@ -119,10 +152,6 @@ function initialiseMap() {
 
     google.maps.event.addListener(map, 'click', function (me) {
         var coordinates = me.latLng;
-    });
-
-    google.maps.event.addListener(map, 'click', function (me) {
-        var coordinates = me.latLng;
         geocodeLatLng(coordinates, function (err, address) {
             if (!err) {
                 //Дізналися адресу
@@ -145,8 +174,9 @@ function geocodeLatLng(latlng, callback) {
     var geocoder = new google.maps.Geocoder();
 
     geocoder.geocode({'location': latlng}, function (results, status) {
-        if (status === google.maps.GeocoderStatus.OK && results[1]) {
-            var address = results[1].formatted_address;
+        if (status === google.maps.GeocoderStatus.OK && results[0]) {
+            var address = results[0].formatted_address;
+            // alert(results[0].formatted_address);
             callback(null, address);
         } else {
             callback(new Error("Can't	find	address"));
@@ -269,7 +299,7 @@ function addressVal() {
 
 
 exports.initialiseOrder = initialiseOrder;
-},{"./API":1}],3:[function(require,module,exports){
+},{"./API":1,"./pizza/PizzaCart":6}],3:[function(require,module,exports){
 /**
  * Created by chaika on 02.02.16.
  */
@@ -530,6 +560,7 @@ exports.getPizzaInCart = getCart;
 exports.initialiseCart = initialiseCart;
 
 exports.PizzaSize = PizzaSize;
+
 },{"../Templates":3,"../localStorage.js":4}],7:[function(require,module,exports){
 /**
  * Created by chaika on 02.02.16.
